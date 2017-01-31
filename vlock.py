@@ -55,6 +55,10 @@ def VL_update(context):
             bm.verts[v[0]].co.z = v[3]
         bpy.context.scene.objects.active = bpy.context.scene.objects.active
         bmesh.update_edit_mesh(mesh, True)
+    
+    if edit_obj is None :
+    	lock_ON = False
+    	
     return True
 
 
