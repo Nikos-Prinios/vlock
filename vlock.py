@@ -24,7 +24,7 @@ bl_info = {
     "api": 44539,
     "category": "3D View",
     "location": "View3D > Header",
-    "description": "This addon helps you lock some vertices in place.",
+    "description": "This addon helps you keep some vertices in place.",
     "warning": "",
     "wiki_url": "",
     "tracker_url": "",}
@@ -47,7 +47,6 @@ def VL_update(context):
     global vertices
     edit_obj = bpy.context.edit_object
     if edit_obj is not None and edit_obj.is_updated_data is True and lock_ON:
-        print('update needed')
         mesh = bpy.context.scene.objects.active.data
         bm = bmesh.from_edit_mesh(mesh)
         for v in vertices:
@@ -101,7 +100,6 @@ class vlock_button(Header):
                 row.operator("scene.lock_action", icon='PINNED', text='')
             else:
                 row.operator("scene.lock_action", icon='UNPINNED', text='')
-            
 
   
 def register():
