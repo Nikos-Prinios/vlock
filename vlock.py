@@ -35,7 +35,10 @@ from bpy.types import Header
 import bmesh
 
 global lock_ON
-global vertices
+import bgl
+import random
+handle = [None]
+from bpy import context
 
 lock_ON = False
 
@@ -58,9 +61,27 @@ def VL_update(context):
     
     if edit_obj is None :
     	lock_ON = False
-    	
+    bpy.context.area.tag_redraw()	
     return True
 
+def callbackFunction():
+    global lock_ON
+    global vertices
+    if lock_ON:
+        obj = context.active_object
+        for v in vertices:
+            xyz = obj.matrix_world * obj.data.vertices[v[0]].co
+            x = xyz[0]
+            y = xyz[1]
+            z = xyz[2]
+            bgl.glPointSize(15)
+            bgl.glColor3f(1.0, 0.0, 0.0)
+            bgl.glBegin(bgl.GL_POINTS)
+            bgl.glVertex3f(float(x),float(y),float(z))
+            bgl.glEnd()
+    else:
+        bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
+        
 
 def lock():
     global vertices
@@ -100,6 +121,7 @@ class vlock_button(Header):
         if edit_obj is not None :
             layout = self.layout
             row = layout.row()
+            row.separator()
             if lock_ON:
                 row.operator("scene.lock_action", icon='PINNED', text='')
             else:
@@ -110,11 +132,16 @@ def register():
     bpy.utils.register_module(__name__)
     bpy.app.handlers.scene_update_post.clear()
     bpy.app.handlers.scene_update_post.append(VL_update)
+    handle[0] = bpy.types.SpaceView3D.draw_handler_add(callbackFunction, (), 'WINDOW', 'POST_VIEW')
+
 
 
 def unregister():
     bpy.utils.unregister_module(__name__)
     bpy.app.handlers.scene_update_post.remove(VL_update)
+    #bpy.types.SpaceView3D.draw_handler_remove(handle[0], 'WINDOW')
+    bpy.types.SpaceView3D.draw_handler_remove(self._handle, 'WINDOW')
+    handle[0] = None
 
 
 if __name__ == "__main__":
